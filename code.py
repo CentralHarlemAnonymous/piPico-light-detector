@@ -16,16 +16,23 @@ from adafruit_httpserver.mime_type import MIMEType
 
 #  connect to SSID
 wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'),
-    os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+                   os.getenv('CIRCUITPY_WIFI_PASSWORD'))
 
 print("Connected to WiFi")
 
 pool = socketpool.SocketPool(wifi.radio)
 server = HTTPServer(pool)
 
+# for debugging:
+#  prints MAC address to REPL
+# print("My MAC addr:", [hex(i) for i in wifi.radio.mac_address])
+
+#  prints IP address to REPL
+# print("My IP address is", wifi.radio.ipv4_address)
+
 #  pings Google
-ipv4 = ipaddress.ip_address("8.8.4.4")
-print("Ping google.com: %f ms" % (wifi.radio.ping(ipv4)*1000))
+# ipv4 = ipaddress.ip_address("8.8.4.4")
+# print("Ping google.com: %f ms" % (wifi.radio.ping(ipv4)*1000))
 
 
 #  get analog data from pin
@@ -34,19 +41,19 @@ analog_in = AnalogIn(board.GP28_A2)
 
 def get_voltage(pin):
     return (pin.value * 3.3) / 65536
-    
+
 def webpage(brightness):
-    if (brightness < .1):
+    if (brightness < .035):
         conclusion = "dark"
-    elif (brightness >= .1 and brightness <= .3):
+    elif (brightness >= .035 and brightness <= .3):
         conclusion = "dim"
     else:
         conclusion = "bright"
     html = f"""
             <!DOCTYPE html>
             <html>
-            <p>light value is is {brightness}</p>
-            <p>this is {conclusion}.</p>
+            <p>Sensor reports a normalized light value of {brightness}.</p>
+            <p>This is {conclusion}.</p>
             </body>
             </html>
             """
